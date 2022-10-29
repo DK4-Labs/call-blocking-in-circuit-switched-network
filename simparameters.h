@@ -30,11 +30,13 @@
 
 /*******************************************************************************/
 
-#define Call_ARRIVALRATE 3   /* calls/minute */
-#define MEAN_CALL_DURATION 3 /* minutes */
+#define Call_ARRIVALRATE 1   /* calls/minute */
+#define MEAN_CALL_DURATION 1 /* minutes */
 #define RUNLENGTH 5e6        /* number of successful calls */
 #define BLIPRATE 1e3
-#define NUMBER_OF_CHANNELS 1
+#define NUMBER_OF_CHANNELS 7
+
+#define OFFERED_LOAD Call_ARRIVALRATE *MEAN_CALL_DURATION
 
 /* Comma separated list of random seeds to run. */
 #define RANDOM_SEED_LIST 400186733, 400175089, 400191540

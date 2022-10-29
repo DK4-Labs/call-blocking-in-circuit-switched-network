@@ -80,5 +80,5 @@ void output_results(Simulation_Run_Ptr this_simulation_run, FILE **writeFile)
          1 - xmtted_fraction, xmtted_fraction);
 
   printf("\n");
-  // fprintf(*writeFile, "%.5f, %ld, %.2f \n", sim_data->random_seed, 1 - xmtted_fraction, );
+  fprintf(*writeFile, "%d, %.5f, %d, %d\n", sim_data->random_seed, 1 - xmtted_fraction, NUMBER_OF_CHANNELS, OFFERED_LOAD);
 }
