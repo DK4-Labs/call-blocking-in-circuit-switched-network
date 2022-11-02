@@ -36,6 +36,7 @@ void cleanup (Simulation_Run_Ptr this_simulation_run)
 {
   int i;
   Simulation_Run_Data_Ptr sim_data;
+  Fifoqueue_Ptr buffer;
 
   sim_data = (Simulation_Run_Data_Ptr) simulation_run_data(this_simulation_run);
 
@@ -45,6 +46,12 @@ void cleanup (Simulation_Run_Ptr this_simulation_run)
       xfree(server_get(*(sim_data->channels+i)));
   }
   xfree(sim_data->channels);
+
+  /* Clean out the queue*/
+  buffer = sim_data->buffer;
+  while (fifoqueue_size(buffer) > 0) /* Clean out the queue. */
+    xfree(fifoqueue_get(buffer));
+  xfree(buffer);
 
   /* Clean up the simulation_run. */
   simulation_run_free_memory(this_simulation_run);

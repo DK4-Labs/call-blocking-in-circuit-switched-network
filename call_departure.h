@@ -42,6 +42,8 @@ end_call_on_channel_event(Simulation_Run_Ptr ThisSimulation_Run, void*);
 long int
 schedule_end_call_on_channel_event(Simulation_Run_Ptr, double, void*);
 
+void
+start_call_on_channel(Simulation_Run_Ptr, Call_Ptr, Channel_Ptr);
 /*******************************************************************************/
 
 #endif /* call_departure.h */

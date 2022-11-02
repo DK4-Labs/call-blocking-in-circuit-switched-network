@@ -88,8 +88,8 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
 				       now + new_call->call_duration,
 				       (void *) free_channel);
   } else {
-    /* No free channel was found. The call is blocked. */
-    sim_data->blocked_call_count++;
+    /* No free channel was found. put in a buffer. */
+    fifoqueue_put(sim_data->buffer, (void*)new_call);
   }
 
   /* Schedule the next call arrival. */

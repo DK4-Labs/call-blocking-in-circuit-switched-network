@@ -32,6 +32,7 @@
 #include "output.h"
 #include "simparameters.h"
 #include "call_departure.h"
+#include "call_arrival.h"
 
 /*******************************************************************************/
 
@@ -62,7 +63,7 @@ schedule_end_call_on_channel_event(Simulation_Run_Ptr simulation_run,
 void
 end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
 {
-  Call_Ptr this_call;
+  Call_Ptr this_call, next_call;
   Channel_Ptr channel;
   Simulation_Run_Data_Ptr sim_data;
   double now;
@@ -85,6 +86,31 @@ end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
 
   /* This call is done. Free up its allocated memory.*/
   xfree((void*) this_call);
+
+  if(fifoqueue_size(sim_data->buffer) > 0){
+    next_call = (Call_Ptr)fifoqueue_get(sim_data->buffer);
+    start_call_on_channel(simulation_run, next_call, channel);
+  }
+}
+
+void
+start_call_on_channel(Simulation_Run_Ptr simulation_run,
+        Call_Ptr this_call,
+        Channel_Ptr channel)
+{
+  double now;
+  now = simulation_run_get_time(simulation_run);
+
+  TRACE(printf("Start of Call.\n");)
+    /* Place the call in the free channel and schedule its
+       departure. */
+    server_put(channel, (void*) this_call);
+    this_call->channel = channel;
+
+    schedule_end_call_on_channel_event(simulation_run,
+				       now + this_call->call_duration,
+				       (void *) channel);
+
 }
 
 

@@ -37,7 +37,7 @@
 #define NUMBER_OF_CHANNELS 11
 
 /* Comma separated list of random seeds to run. */
-#define RANDOM_SEED_LIST 333, 4444, 55555
+#define RANDOM_SEED_LIST 400191540, 400175089, 400186733
 
 /*******************************************************************************/
 
