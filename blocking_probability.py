@@ -1,5 +1,5 @@
 import math
-from wsgiref.simple_server import demo_app
+import matplotlib.pyplot as plt
 
 
 def erlang_probability(A, m):
@@ -20,24 +20,19 @@ def main():
 
     PB_all = []
 
-    PB_1 = []
-    PB_2 = []
-    PB_3 = []
-    PB_4 = []
-    PB_5 = []
-    PB_6 = []
-    PB_7 = []
-    PB_8 = []
-    PB_9 = []
-    PB_10 = []
-
     for i in range(19):
         CHANNELS.append(i)
 
     for i in range(1, 10):
-        for j in range(1, channels):
+        for j in range(1, channels+1):
             PB = erlang_probability(i, j)
             PB_all.append(PB)
+
+    chunked_list = list()
+    chunk_size = 19
+
+    for i in range(0, len(PB_all), chunk_size):
+        chunked_list.append(PB_all[i:i+chunk_size])
 
     denom_sum = 0
 
@@ -47,17 +42,10 @@ def main():
     #     denom_sum = denom_sum + denom
     #     PB_1.append(numerator/denom_sum)
 
-    print(PB_all)
-    # print(PB_1)
-    # print(PB_2)
-    # print(PB_3)
-    # print(PB_4)
-    # print(PB_5)
-    # print(PB_6)
-    # print(PB_7)
-    # print(PB_8)
-    # print(PB_9)
-    # print(PB_10)
+    print(chunked_list)
+
+    plt.plot(CHANNELS, chunked_list[0])
+    plt.show()
 
 
 if __name__ == "__main__":
