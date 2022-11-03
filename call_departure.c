@@ -62,10 +62,10 @@ schedule_end_call_on_channel_event(Simulation_Run_Ptr simulation_run,
 void
 end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
 {
-  Call_Ptr this_call;
+  Call_Ptr this_call, next_call;
   Channel_Ptr channel;
   Simulation_Run_Data_Ptr sim_data;
-  double now;
+  double now, wait_time;
 
   channel = (Channel_Ptr) c_ptr;
 
@@ -85,6 +85,22 @@ end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
 
   /* This call is done. Free up its allocated memory.*/
   xfree((void*) this_call);
+
+  if(fifoqueue_size(sim_data->queue) > 0)
+  {
+    next_call = (Call_Ptr) fifoqueue_get(sim_data->queue);
+    
+    wait_time = now - next_call->arrive_time;
+    sim_data->accumulated_wait_time += wait_time;
+    if(wait_time < WAIT_THRESHOLD)
+      sim_data->wait_call_less_than_threshold_count += 1;
+    /*Place the call in the current free channel and schedule end call*/
+    server_put(channel, (void*)next_call);
+    next_call->channel = channel;
+
+    schedule_end_call_on_channel_event(simulation_run, now+next_call->call_duration, (void *) channel);
+    
+  }
 }
 
 

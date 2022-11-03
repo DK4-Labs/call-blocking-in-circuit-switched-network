@@ -69,11 +69,15 @@ int main(void)
     data.blip_counter = 0;
     data.call_arrival_count = 0;
     data.calls_processed = 0;
-    data.blocked_call_count = 0;
+    data.wait_call_count = 0;
+    data.wait_call_less_than_threshold_count = 0;
     data.number_of_calls_processed = 0;
     data.accumulated_call_time = 0.0;
+    data.accumulated_wait_time = 0.0;
     data.random_seed = random_seed;
 
+    /* Create the queue*/
+    data.queue = fifoqueue_new();
     /* Create the channels. */
     data.channels = (Channel_Ptr *) xcalloc((int) NUMBER_OF_CHANNELS,
 					    sizeof(Channel_Ptr));
