@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
   call_arrival.c
   call_departure.c
   call_duration.c
+  on_hold_duration.c
   cleanup.c
   main.c
   output.c

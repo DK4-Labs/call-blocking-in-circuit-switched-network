@@ -32,6 +32,7 @@
 #include "simparameters.h"
 #include "call_departure.h"
 #include "call_arrival.h"
+#include "on_hold_duration.h"
 
 /*******************************************************************************/
 
@@ -75,6 +76,7 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
     new_call = (Call_Ptr) xmalloc(sizeof(Call));
     new_call->arrive_time = now;
     new_call->call_duration = get_call_duration();
+    new_call->on_hold_duration = get_on_hold_duration();
 
   /* See if there is a free channel.*/
   if((free_channel = get_free_channel(simulation_run)) != NULL) {
@@ -83,8 +85,6 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
        departure. */
     server_put(free_channel, (void*) new_call);
     new_call->channel = free_channel;
-
-    sim_data->wait_call_less_than_threshold_count += 1;
 
     schedule_end_call_on_channel_event(simulation_run,
 				       now + new_call->call_duration,

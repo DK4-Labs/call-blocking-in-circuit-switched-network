@@ -64,8 +64,7 @@ void output_progress_msg_to_screen(Simulation_Run_Ptr this_simulation_run)
 void output_results(Simulation_Run_Ptr this_simulation_run)
 {
   double xmtted_fraction, wait_fraction;
-  double A, Pw, Tw, W_t;
-  double average_wait_time, prob_less_than_thres;
+  double average_wait_time, hang_up_probability;
   Simulation_Run_Data_Ptr sim_data;
 
   sim_data = (Simulation_Run_Data_Ptr) simulation_run_data(this_simulation_run);
@@ -75,22 +74,13 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   printf("random seed = %d \n", sim_data->random_seed);
   printf("call arrival count = %ld \n", sim_data->call_arrival_count);
   printf("calls that have to wait count = %ld \n", sim_data->wait_call_count);
-  printf("calls that wait less than threshold = %ld \n", sim_data->wait_call_less_than_threshold_count);
+  printf("hung up calls = %ld \n", sim_data->hang_up_call_count);
   
-  
-  A = Call_ARRIVALRATE * MEAN_CALL_DURATION;
-  wait_fraction =  ((double)sim_data->wait_call_count)/(sim_data->call_arrival_count);
-  //calculated value
-  Tw = (wait_fraction*60.0*MEAN_CALL_DURATION)/(NUMBER_OF_CHANNELS*(1.0 - A/NUMBER_OF_CHANNELS));
+  //hang up probability
+  hang_up_probability = ((double) sim_data->hang_up_call_count)/(sim_data->call_arrival_count);
+
   //actual value
   average_wait_time = ( 60.0 * (double)sim_data->accumulated_wait_time)/(sim_data->call_arrival_count);
-
-  //Calculated value
-  W_t = 1.0 - (wait_fraction * (exp(-1.0*(NUMBER_OF_CHANNELS - A)*WAIT_THRESHOLD/MEAN_CALL_DURATION)));
-
-  //Actual Value
-  prob_less_than_thres = (double)sim_data->wait_call_less_than_threshold_count/sim_data->call_arrival_count;
-  printf("Probability of less than threshold = %.5f\n", prob_less_than_thres );
 
   xmtted_fraction = (double) (sim_data->call_arrival_count -
       sim_data->wait_call_count)/sim_data->call_arrival_count;
@@ -98,8 +88,9 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   printf("Blocking probability = %.5f (Service fraction = %.5f)\n",
 	 1-xmtted_fraction, xmtted_fraction);
 
-  printf("Average wait time calculated = %.5fs, Average wait time simulated = %.5fs \n", Tw, average_wait_time);
-  printf("Probability of less than %d seconds, Calculated = %.5f, Simulated = %.5f \n", WAIT_THRESHOLD*60, W_t, prob_less_than_thres);
+  printf("Hang Up Probability = %.5f Average wait time= %.5f", hang_up_probability ,average_wait_time);
+
+  /* output order: w, N, Hang up Probability, average wait time */
 
   printf("\n");
 }

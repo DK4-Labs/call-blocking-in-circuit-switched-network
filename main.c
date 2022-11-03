@@ -70,7 +70,7 @@ int main(void)
     data.call_arrival_count = 0;
     data.calls_processed = 0;
     data.wait_call_count = 0;
-    data.wait_call_less_than_threshold_count = 0;
+    data.hang_up_call_count = 0;
     data.number_of_calls_processed = 0;
     data.accumulated_call_time = 0.0;
     data.accumulated_wait_time = 0.0;
