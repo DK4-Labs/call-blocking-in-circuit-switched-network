@@ -72,6 +72,7 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   printf("random seed = %d \n", sim_data->random_seed);
   printf("call arrival count = %ld \n", sim_data->call_arrival_count);
   printf("blocked call count = %ld \n", sim_data->blocked_call_count);
+  printf("average waiting time in FIFO queue = %f \n", sim_data->total_call_waiting_time/sim_data->call_arrival_count);
 
   xmtted_fraction = (double) (sim_data->call_arrival_count -
       sim_data->blocked_call_count)/sim_data->call_arrival_count;

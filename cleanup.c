@@ -46,6 +46,15 @@ void cleanup (Simulation_Run_Ptr this_simulation_run)
   }
   xfree(sim_data->channels);
 
+  void * dummy_call = fifoqueue_get(sim_data->fifo);
+  while(dummy_call != NULL)
+  {
+    xfree(dummy_call);
+    dummy_call = fifoqueue_get(sim_data->fifo);
+  }
+
+  xfree(sim_data->fifo);
+
   /* Clean up the simulation_run. */
   simulation_run_free_memory(this_simulation_run);
 }

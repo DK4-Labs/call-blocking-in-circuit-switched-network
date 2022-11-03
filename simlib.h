@@ -194,7 +194,12 @@ void *
 fifoqueue_get(Fifoqueue_Ptr);
 
 int
+fifoqueue_remove(Fifoqueue_Ptr queue_ptr, void * call_ptr);
+
+int
 fifoqueue_size(Fifoqueue_Ptr);
+
+void fifoqueue_flush(Fifoqueue_Ptr queue_ptr);
 
 void *
 fifoqueue_see_front(Fifoqueue_Ptr);

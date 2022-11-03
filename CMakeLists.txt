@@ -17,7 +17,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 
 # Set some typical compiler flags.
 #
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 
 # List all the source files after the add_executable line.
 #

@@ -229,7 +229,7 @@ simulation_run_deschedule_event(Simulation_Run_Ptr simulation_run,
   int i;
   Event_Container_Ptr current_container, found_container=NULL,
     next_container, previous_container;
-  void * content_ptr = NULL;
+  void * content_ptr = (void *) 0x01;
 
   Eventlist_Ptr event_list;
 
@@ -457,8 +457,15 @@ fifoqueue_get(Fifoqueue_Ptr queue_ptr)
   Queue_Container_Ptr removed_container_ptr;
   void* content_ptr;
 
+  // printf("%p %p\n", queue_ptr->front_ptr, queue_ptr->back_ptr);
+
   if (queue_ptr->size > 0) {
     removed_container_ptr = queue_ptr->front_ptr;
+    if (queue_ptr->front_ptr == NULL)
+    {
+      fifoqueue_flush(queue_ptr);
+      return NULL;
+    }
     queue_ptr->front_ptr = removed_container_ptr->next_ptr;
     content_ptr = removed_container_ptr->content_ptr;
     free((char*) removed_container_ptr);
@@ -473,6 +480,63 @@ fifoqueue_get(Fifoqueue_Ptr queue_ptr)
 }
 
 /*
+ * Take something out of a FIFO queue, not from the front. Whatever it is should be cast to a void
+ * pointer.
+ */
+
+int
+fifoqueue_remove(Fifoqueue_Ptr queue_ptr, void * call_ptr)
+{
+  Queue_Container_Ptr dummy = queue_ptr->front_ptr, lag_dummy = queue_ptr->front_ptr;
+
+  if (queue_ptr->size > 0) {
+    /* check if the value is in the head*/
+    if(call_ptr == dummy->content_ptr)
+    {
+      queue_ptr->front_ptr = dummy->next_ptr;
+      queue_ptr->size--;
+      free((char *) dummy);
+      return 0;
+    }
+    while (dummy != NULL)
+    {
+      if (call_ptr == dummy->content_ptr)
+      {
+        lag_dummy->next_ptr = dummy->next_ptr;
+        break;
+      }
+      lag_dummy = dummy;
+      dummy = dummy->next_ptr;
+    }
+
+    if (dummy == NULL)
+    {
+      printf("ERROR: fifoqueue_remove cant find element");
+      return 0;
+    }
+
+    if (dummy == queue_ptr->front_ptr)
+    {
+      queue_ptr->front_ptr = dummy->next_ptr;
+    }
+    else if (dummy == queue_ptr->back_ptr)
+    {
+      printf("here");
+    }
+
+    free((char*) dummy);
+
+    if(queue_ptr->size == 1) queue_ptr->back_ptr = NULL;
+    queue_ptr->size--;
+  }
+  else {
+    printf("ERROR: fifoqueue_remove empty fifo");
+    exit(1);
+  }
+  return 0;
+}
+
+/*
  * Get the number of objects currently in the Fifoqueue.
  */
 
@@ -480,6 +544,13 @@ int
 fifoqueue_size(Fifoqueue_Ptr queue_ptr)
 {
   return queue_ptr->size;
+}
+
+void fifoqueue_flush(Fifoqueue_Ptr queue_ptr)
+{
+  queue_ptr->size = 0;
+  queue_ptr->front_ptr = NULL;
+  queue_ptr->back_ptr = NULL;
 }
 
 /*

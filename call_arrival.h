@@ -49,6 +49,13 @@ call_arrival_event(Simulation_Run_Ptr, void *);
 long int
 schedule_call_arrival_event(Simulation_Run_Ptr, double);
 
+long int
+schedule_call_hang_up_event(Simulation_Run_Ptr simulation_run, 
+			    double event_time, void *);
+                
+void
+call_hang_up_event(Simulation_Run_Ptr simulation_run, void * dummy_ptr);
+
 /*******************************************************************************/
 
 #endif /* call_arrival.h */

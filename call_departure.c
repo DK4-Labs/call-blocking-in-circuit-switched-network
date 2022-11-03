@@ -85,6 +85,33 @@ end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
 
   /* This call is done. Free up its allocated memory.*/
   xfree((void*) this_call);
+
+  // check if calls are waiting in FIFO, if so service them with this channel
+  if (fifoqueue_size(sim_data->fifo) > 0)
+  {
+    Call_Ptr waiting_call = (Call_Ptr) fifoqueue_get(sim_data->fifo);
+
+    if (waiting_call == NULL)
+    {
+      printf("WARNING: Queue needed to be flushed\n");
+      return;
+    }
+
+    if (simulation_run_deschedule_event(simulation_run, waiting_call->hang_up_event_id) == (void *)0x01)
+    {
+      printf("ERROR: event not scheduled\n");
+      exit(1);
+    };
+
+    sim_data->total_call_waiting_time = (now - waiting_call->arrive_time) >= 0.0 ? sim_data->total_call_waiting_time + (now - waiting_call->arrive_time) : 0/0;
+
+    server_put(channel, (void*) waiting_call);
+    waiting_call->channel = channel;
+
+    schedule_end_call_on_channel_event(simulation_run,
+                now + waiting_call->call_duration,
+                (void *) channel);
+  }
 }
 
 

@@ -49,7 +49,7 @@ int main(void)
    * Get the list of random number generator seeds defined in simparameters.h.
    */
 
-  unsigned RANDOM_SEEDS[] = {RANDOM_SEED_LIST, 0};
+  unsigned RANDOM_SEEDS[] = {RANDOM_SEED_LIST, 400175089, 0};
   unsigned random_seed;
 
   /* 
@@ -73,6 +73,7 @@ int main(void)
     data.number_of_calls_processed = 0;
     data.accumulated_call_time = 0.0;
     data.random_seed = random_seed;
+    data.total_call_waiting_time = 0.0;
 
     /* Create the channels. */
     data.channels = (Channel_Ptr *) xcalloc((int) NUMBER_OF_CHANNELS,
@@ -82,6 +83,8 @@ int main(void)
     for (i=0; i<NUMBER_OF_CHANNELS; i++) {
       *(data.channels+i) = server_new(); 
     }
+
+    data.fifo = fifoqueue_new();
 
     /* Set the random number generator seed. */
     random_generator_initialize((unsigned) random_seed);

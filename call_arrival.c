@@ -71,13 +71,19 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
   sim_data = simulation_run_data(simulation_run);
   sim_data->call_arrival_count++;
 
+  /* Allocate some memory for the call. If we can't service it immediately, put it in the FIFO */
+  new_call = (Call_Ptr) xmalloc(sizeof(Call));
+  new_call->arrive_time = now;
+  new_call->call_duration = get_call_duration();
+  new_call->waiting_time = exponential_generator(CALL_MEAN_WAITING_TIME);
+  new_call->channel = NULL;
+  new_call->hang_up_event_id = 0;
+
   /* See if there is a free channel.*/
   if((free_channel = get_free_channel(simulation_run)) != NULL) {
 
-    /* Yes, we found one. Allocate some memory and start the call. */
-    new_call = (Call_Ptr) xmalloc(sizeof(Call));
-    new_call->arrive_time = now;
-    new_call->call_duration = get_call_duration();
+    // No waiting time for this call
+    sim_data->total_call_waiting_time += 0;
 
     /* Place the call in the free channel and schedule its
        departure. */
@@ -88,8 +94,11 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
 				       now + new_call->call_duration,
 				       (void *) free_channel);
   } else {
-    /* No free channel was found. The call is blocked. */
-    sim_data->blocked_call_count++;
+    /* No free channel was found. The call is added to FIFO queue */
+    //sim_data->blocked_call_count++;
+
+    new_call->hang_up_event_id = schedule_call_hang_up_event(simulation_run, new_call->arrive_time + new_call->waiting_time, (void *) new_call);
+    fifoqueue_put(sim_data->fifo, (void *) new_call);
   }
 
   /* Schedule the next call arrival. */
@@ -97,6 +106,58 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
 	      now + exponential_generator((double) 1/Call_ARRIVALRATE));
 }
 
+/*******************************************************************************/
+
+/*
+ * Function to schedule call hang up
+ */
+
+long int
+schedule_call_hang_up_event(Simulation_Run_Ptr simulation_run, 
+			    double event_time, void * call_ptr)
+{
+  Event new_event;
+
+  new_event.description = "Call Dropped";
+  new_event.function = call_hang_up_event;
+  new_event.attachment = call_ptr;
+
+  return simulation_run_schedule_event(simulation_run, new_event, event_time);
+}
+
+/*******************************************************************************/
+
+/*
+ * Hang up handler function
+ */
+
+void
+call_hang_up_event(Simulation_Run_Ptr simulation_run, void * call_ptr)
+{
+  Simulation_Run_Data_Ptr sim_data;
+  double now;
+  Call_Ptr fifo_dropped_call = (Call_Ptr) call_ptr;
+
+  sim_data = simulation_run_data(simulation_run);
+
+  now = simulation_run_get_time(simulation_run);
+
+  // dequeue from fifo
+  fifoqueue_remove(sim_data->fifo, (void *) fifo_dropped_call);
+
+  // check that dequeued call is not null
+  if (fifo_dropped_call == NULL)
+  {
+    printf("\nERROR: attempt to dequeue empty queue\n");
+    exit(1);
+  }
+
+  sim_data->total_call_waiting_time += now - fifo_dropped_call->arrive_time;
+  sim_data->blocked_call_count++;
+
+  // free memory
+  xfree((void*) fifo_dropped_call);
+}
 /*******************************************************************************/
 
 /*
