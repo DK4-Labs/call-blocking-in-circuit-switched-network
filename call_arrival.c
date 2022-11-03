@@ -84,6 +84,8 @@ call_arrival_event(Simulation_Run_Ptr simulation_run, void * ptr)
     server_put(free_channel, (void*) new_call);
     new_call->channel = free_channel;
 
+    sim_data->wait_call_less_than_threshold_count += 1;
+
     schedule_end_call_on_channel_event(simulation_run,
 				       now + new_call->call_duration,
 				       (void *) free_channel);

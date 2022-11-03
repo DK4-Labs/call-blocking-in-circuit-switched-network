@@ -93,7 +93,9 @@ end_call_on_channel_event(Simulation_Run_Ptr simulation_run, void * c_ptr)
     wait_time = now - next_call->arrive_time;
     sim_data->accumulated_wait_time += wait_time;
     if(wait_time < WAIT_THRESHOLD)
+    {
       sim_data->wait_call_less_than_threshold_count += 1;
+    }
     /*Place the call in the current free channel and schedule end call*/
     server_put(channel, (void*)next_call);
     next_call->channel = channel;

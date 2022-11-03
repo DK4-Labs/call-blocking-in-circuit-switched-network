@@ -86,10 +86,10 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   average_wait_time = ( 60.0 * (double)sim_data->accumulated_wait_time)/(sim_data->call_arrival_count);
 
   //Calculated value
-  W_t = 1.0 - (wait_fraction * (exp(-1.0*(NUMBER_OF_CHANNELS - A)*WAIT_THRESHOLD/(MEAN_CALL_DURATION))));
+  W_t = 1.0 - (wait_fraction * (exp(-1.0*(NUMBER_OF_CHANNELS - A)*WAIT_THRESHOLD/MEAN_CALL_DURATION)));
 
   //Actual Value
-  prob_less_than_thres = (double)sim_data->wait_call_less_than_threshold_count/sim_data->wait_call_count;
+  prob_less_than_thres = (double)sim_data->wait_call_less_than_threshold_count/sim_data->call_arrival_count;
   printf("Probability of less than threshold = %.5f\n", prob_less_than_thres );
 
   xmtted_fraction = (double) (sim_data->call_arrival_count -
@@ -98,8 +98,8 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   printf("Blocking probability = %.5f (Service fraction = %.5f)\n",
 	 1-xmtted_fraction, xmtted_fraction);
 
-  printf("Average wait time calculated = %.5f, Average wait time simulated = %.5f \n", Tw, average_wait_time);
-  printf("Probability of less than %d seconds, Calculated = %.5f, Simulated = %.5f \n", WAIT_THRESHOLD, W_t, prob_less_than_thres);
+  printf("Average wait time calculated = %.5fs, Average wait time simulated = %.5fs \n", Tw, average_wait_time);
+  printf("Probability of less than %d seconds, Calculated = %.5f, Simulated = %.5f \n", WAIT_THRESHOLD*60, W_t, prob_less_than_thres);
 
   printf("\n");
 }
